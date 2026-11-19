@@ -99,15 +99,15 @@ export const datos = {
     {
       grupo: "Herramientas de IA",
       items: [
-        { nombre: "Grok Bot", iconos: ["grok-bot.webp"], icono: "img/icons/grok-bot.webp" },
+        { nombre: "Grok Bot", icono: "img/icons/grok-bot.webp" },
         { nombre: "Cursor", iconos: ["cursor"] },
         { nombre: "NotebookLM", iconos: ["notebooklm"] },
         { nombre: "Gemini", iconos: ["gemini"] },
-        { nombre: "Gamma AI", iconos: ["gamma-ai"], icono: "" }, // PENDIENTE: imagen que mande Joss
+        { nombre: "Gamma AI", icono: "img/icons/gamma-ai.webp" },
         { nombre: "Claude", iconos: ["claude"] },
         { nombre: "ChatGPT", iconos: ["chatgpt"] },
         { nombre: "Perplexity", iconos: ["perplexity"] },
-        { nombre: "Copilot", iconos: ["copilot"], icono: "" }, // PENDIENTE: imagen que mande Joss
+        { nombre: "Copilot", icono: "img/icons/copilot.webp" }
       ],
     },
   ],

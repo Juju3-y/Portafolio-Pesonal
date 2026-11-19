@@ -114,6 +114,34 @@ function redesActivas() {
   return redes;
 }
 
+
+const svgMonitor = `<svg viewBox="0 0 200 168" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M28 118L100 148L172 118L100 88L28 118Z" fill="#c5d4cb"/><path d="M28 118V130L100 160V148L28 118Z" fill="#9aafa3"/><path d="M172 118V130L100 160V148L172 118Z" fill="#7e9588"/><path d="M86 136L100 142V154L86 148V136Z" fill="#2a4a54"/><path d="M114 136L100 142V154L114 148V136Z" fill="#1d3840"/><path d="M40 28L100 52L160 28L100 4L40 28Z" fill="#2a4a54"/><path d="M40 28V104L100 128V52L40 28Z" fill="#1d3840"/><path d="M160 28V104L100 128V52L160 28Z" fill="#243036"/><path d="M48 34L100 54L152 34L100 14L48 34Z" fill="#e4eee8"/><path d="M48 34V96L100 116V54L48 34Z" fill="#d5e2da"/><path d="M152 34V96L100 116V54L152 34Z" fill="#c5d4cb"/><path d="M62 48L92 60" stroke="#2a4a54" stroke-width="3" stroke-linecap="round" opacity=".55"/><path d="M62 58L86 68" stroke="#2a4a54" stroke-width="3" stroke-linecap="round" opacity=".4"/><path d="M62 68L96 82" stroke="#4a5b63" stroke-width="3" stroke-linecap="round" opacity=".35"/></svg>`;
+
+const svgEngranaje = `<svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M32 6h16l3 9 9-4 8 14-8 6 8 6-8 14-9-4-3 9H32l-3-9-9 4-8-14 8-6-8-6 8-14 9 4 3-9Z" fill="#c5d4cb"/><path d="M32 8h16l2.6 8.2 8.2-3.6 6.4 11.4-7 5.2 7 5.2-6.4 11.4-8.2-3.6L48 72H32l-2.6-8.2-8.2 3.6-6.4-11.4 7-5.2-7-5.2 6.4-11.4 8.2 3.6L32 8Z" fill="#9aafa3"/><circle cx="40" cy="40" r="13" fill="#e4eee8"/><circle cx="40" cy="40" r="7" fill="#2a4a54"/></svg>`;
+
+const svgUsb = `<svg viewBox="0 0 90 54" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 20L38 8L82 20L52 32L8 20Z" fill="#2a4a54"/><path d="M8 20V32L52 44V32L8 20Z" fill="#1d3840"/><path d="M82 20V32L52 44V32L82 20Z" fill="#243036"/><path d="M52 8L82 20L82 12L52 0L52 8Z" fill="#4a5b63"/><path d="M58 12L62 10.5V16L58 17.5V12Z" fill="#e4eee8"/><path d="M66 14.5L70 13V18.5L66 20V14.5Z" fill="#e4eee8"/><path d="M8 20L22 14.5L22 22L8 27.5V20Z" fill="#c5d4cb"/><path d="M8 27.5L22 22V30.5L8 36V27.5Z" fill="#9aafa3"/></svg>`;
+
+const svgCodigo = `<svg viewBox="0 0 100 88" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 28L50 12L82 28L50 44L18 28Z" fill="#e4eee8"/><path d="M18 28V60L50 76V44L18 28Z" fill="#c5d4cb"/><path d="M82 28V60L50 76V44L82 28Z" fill="#9aafa3"/><path d="M36 42L28 50L36 58" stroke="#2a4a54" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M64 42L72 50L64 58" stroke="#2a4a54" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M54 38L46 62" stroke="#4a5b63" stroke-width="4" stroke-linecap="round"/></svg>`;
+
+const svgImpresora = `<svg viewBox="0 0 110 90" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 42L55 26L90 42L55 58L20 42Z" fill="#4a5b63"/><path d="M20 42V62L55 78V58L20 42Z" fill="#2a4a54"/><path d="M90 42V62L55 78V58L90 42Z" fill="#1d3840"/><path d="M34 22L55 12L76 22L55 32L34 22Z" fill="#f7faf8"/><path d="M34 22V40L55 50V32L34 22Z" fill="#e4eee8"/><path d="M76 22V40L55 50V32L76 22Z" fill="#d5e2da"/><path d="M42 28h8M42 33h12" stroke="#2a4a54" stroke-width="2" stroke-linecap="round" opacity=".45"/><circle cx="28" cy="50" r="3" fill="#e4eee8"/><circle cx="36" cy="54" r="3" fill="#c5d4cb"/></svg>`;
+
+const svgChip = `<svg viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 30L45 18L68 30L45 42L22 30Z" fill="#2a4a54"/><path d="M22 30V54L45 66V42L22 30Z" fill="#1d3840"/><path d="M68 30V54L45 66V42L68 30Z" fill="#243036"/><path d="M30 32L45 24L60 32L45 40L30 32Z" fill="#c5d4cb"/><path d="M16 34L22 31V37L16 40V34Z" fill="#9aafa3"/><path d="M16 42L22 39V45L16 48V42Z" fill="#9aafa3"/><path d="M16 50L22 47V53L16 56V50Z" fill="#9aafa3"/><path d="M74 34L68 31V37L74 40V34Z" fill="#c5d4cb"/><path d="M74 42L68 39V45L74 48V42Z" fill="#c5d4cb"/><path d="M74 50L68 47V53L74 56V50Z" fill="#c5d4cb"/></svg>`;
+
+function figura(clase, markup) {
+  const d = document.createElement("div");
+  d.className = clase;
+  d.setAttribute("aria-hidden", "true");
+  d.innerHTML = markup;
+  return d;
+}
+
+function capaDecor(claseCapa, piezas) {
+  const capa = el("div", { class: claseCapa, "aria-hidden": "true" });
+  for (const [clase, svg] of piezas) capa.append(figura(clase, svg));
+  return capa;
+}
+
+
 function render() {
   const nav = el(
     "nav",
@@ -121,64 +149,49 @@ function render() {
     navItems.map(([href, t]) => el("a", { href, text: t })),
   );
 
-  const menuBtn = el("button", {
-    class: "menu-btn",
-    type: "button",
-    "aria-expanded": "false",
-    "aria-controls": "nav",
-    text: "Menú",
-  });
-
-  const cerrarNav = () => {
-    nav.classList.remove("abierto");
-    menuBtn.setAttribute("aria-expanded", "false");
-  };
-
-  menuBtn.addEventListener("click", () => {
-    const open = nav.classList.toggle("abierto");
-    menuBtn.setAttribute("aria-expanded", String(open));
-  });
-  nav.addEventListener("click", (e) => {
-    if (e.target.tagName === "A") cerrarNav();
-  });
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") cerrarNav();
-  });
-
   const header = el(
     "header",
     { class: "barra" },
     el(
       "div",
       { class: "envoltorio barra-dentro" },
-      el("a", { class: "marca", href: "#inicio", text: datos.nombreCorto }),
-      menuBtn,
-      nav,
-      redesActivas().length &&
-        el(
-          "div",
-          { class: "barra-redes", "aria-label": "Redes" },
-          redesActivas().map((r) =>
-            el(
-              "a",
-              {
-                class: "red-enlace red-enlace-barra",
-                href: r.href,
-                target: "_blank",
-                rel: "noopener noreferrer",
-                "aria-label": r.nombre,
-              },
-              el("img", { src: r.icono, alt: "", width: "18", height: "18" }),
+      el(
+        "div",
+        { class: "barra-fila" },
+        el("a", { class: "marca", href: "#inicio", text: datos.nombreCorto }),
+        redesActivas().length &&
+          el(
+            "div",
+            { class: "barra-redes", "aria-label": "Redes" },
+            redesActivas().map((r) =>
+              el(
+                "a",
+                {
+                  class: "red-enlace red-enlace-barra",
+                  href: r.href,
+                  target: "_blank",
+                  rel: "noopener noreferrer",
+                  "aria-label": r.nombre,
+                },
+                el("img", { src: r.icono, alt: "", width: "18", height: "18" }),
+              ),
             ),
           ),
-        ),
-      btnCV("btn btn-cv", true),
+        btnCV("btn btn-cv", true),
+      ),
+      nav,
     ),
   );
 
   const hero = el(
     "section",
     { class: "hero envoltorio", id: "inicio", "aria-label": "Presentación" },
+    capaDecor("decor-capa hero-decor", [
+      ["deco deco-monitor", svgMonitor],
+      ["deco deco-engranaje", svgEngranaje],
+      ["deco deco-usb", svgUsb],
+      ["deco deco-codigo", svgCodigo],
+    ]),
     el(
       "div",
       { class: "hero-texto" },
@@ -230,6 +243,7 @@ function render() {
   const experiencia = el(
     "section",
     { class: "envoltorio", id: "experiencia" },
+    figura("deco seccion-decor", svgEngranaje),
     el("h2", { text: "Experiencia" }),
     el(
       "div",
@@ -252,6 +266,7 @@ function render() {
   const proyectos = el(
     "section",
     { class: "envoltorio", id: "proyectos" },
+    figura("deco seccion-decor", svgImpresora),
     el("h2", { text: "Proyectos" }),
     el(
       "div",
@@ -283,6 +298,7 @@ function render() {
   const habilidades = el(
     "section",
     { class: "envoltorio", id: "habilidades" },
+    figura("deco seccion-decor", svgCodigo),
     el("h2", { text: "Habilidades" }),
     el(
       "div",
@@ -294,6 +310,7 @@ function render() {
   const certificaciones = el(
     "section",
     { class: "envoltorio", id: "certificaciones" },
+    figura("deco seccion-decor", svgChip),
     el("h2", { text: "Certificaciones" }),
     el(
       "div",
