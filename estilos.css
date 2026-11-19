@@ -466,3 +466,38 @@ section h2 {
   width: 16px;
   height: 16px;
 }
+
+.chip-foto {
+  overflow: hidden;
+  padding: 0;
+  background: transparent;
+  border-radius: 50%;
+}
+
+.chip-foto img {
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.barra-redes {
+  display: none;
+  align-items: center;
+  gap: 6px;
+}
+
+.red-enlace-barra {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+}
+
+.red-enlace-barra img {
+  width: 18px;
+  height: 18px;
+}
+
+@media (min-width: 961px) {
+  .barra-redes { display: flex; }
+}

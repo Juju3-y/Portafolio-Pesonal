@@ -49,18 +49,36 @@ const iconosInteres = {
   ciberseguridad: "ciberseguridad",
 };
 
+function iconSrc(id) {
+  if (!id) return "";
+  if (id.startsWith("img/") || id.startsWith("/") || id.startsWith("http")) return id;
+  if (id.includes(".")) return `img/icons/${id}`;
+  return `img/icons/${id}.svg`;
+}
+
+function esFoto(src) {
+  return /\.(webp|png|jpe?g|gif)(\?|$)/i.test(src);
+}
+
 function chipIconos(nombres) {
-  return (nombres || []).map((id) =>
-    el(
+  return (nombres || []).filter(Boolean).map((id) => {
+    const src = iconSrc(id);
+    const foto = esFoto(src);
+    return el(
       "span",
-      { class: "chip-icono", "aria-hidden": "true" },
-      el("img", { src: `img/icons/${id}.svg`, alt: "", width: "16", height: "16" }),
-    ),
-  );
+      { class: foto ? "chip-icono chip-foto" : "chip-icono", "aria-hidden": "true" },
+      el("img", { src, alt: "", width: foto ? "28" : "16", height: foto ? "28" : "16" }),
+    );
+  });
 }
 
 function chip(texto, iconos) {
   return el("li", { class: "chip" }, chipIconos(iconos), el("span", { class: "chip-texto", text: texto }));
+}
+
+function iconosDeItem(item) {
+  if (item.icono) return [item.icono];
+  return item.iconos || [];
 }
 
 function chipList(items) {
@@ -69,7 +87,7 @@ function chipList(items) {
     { class: "chips" },
     items.map((item) => {
       const t = item.detalle ? `${item.nombre} (${item.detalle})` : item.nombre;
-      return chip(t, item.iconos);
+      return chip(t, iconosDeItem(item));
     }),
   );
 }
@@ -136,6 +154,24 @@ function render() {
       el("a", { class: "marca", href: "#inicio", text: datos.nombreCorto }),
       menuBtn,
       nav,
+      redesActivas().length &&
+        el(
+          "div",
+          { class: "barra-redes", "aria-label": "Redes" },
+          redesActivas().map((r) =>
+            el(
+              "a",
+              {
+                class: "red-enlace red-enlace-barra",
+                href: r.href,
+                target: "_blank",
+                rel: "noopener noreferrer",
+                "aria-label": r.nombre,
+              },
+              el("img", { src: r.icono, alt: "", width: "18", height: "18" }),
+            ),
+          ),
+        ),
       btnCV("btn btn-cv", true),
     ),
   );

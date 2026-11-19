@@ -10,8 +10,8 @@ export const datos = {
   correoLink: "mailto:Josepeemanuel@gmail.com",
   github: "https://github.com/Juju3-y",
   githubTexto: "github.com/Juju3-y",
-  linkedin: "",
-  linkedinTexto: "",
+  linkedin: "", // PENDIENTE: pegar URL; si está vacío no se muestra
+  linkedinTexto: "", // ej. "linkedin.com/in/..."
   perfil:
     "Estudiante técnico en Desarrollo Web y en soporte técnico y hardware, en formación en el CTP La Carpio (2022–2027). Tengo experiencia en ensamblaje y mantenimiento de computadoras, en atención al cliente y en proyectos de mantenimiento, armado y desarmado de computadoras e impresoras. Me interesa el soporte técnico, el desarrollo web, las redes y la ciberseguridad. No me enfoco solo en la tecnología: también me desempeño en otras áreas.",
   seo: {
@@ -69,7 +69,12 @@ export const datos = {
     {
       grupo: "Desarrollo web",
       items: [
-        { nombre: "HTML y CSS", detalle: "conocimientos básicos a intermedios", iconos: ["html5", "css3"] },
+        { nombre: "HTML", iconos: ["html5"] },
+        { nombre: "CSS", iconos: ["css"] },
+        { nombre: "JavaScript", iconos: ["javascript"] },
+        { nombre: "PHP", iconos: ["php"] },
+        { nombre: "phpMyAdmin", iconos: ["phpmyadmin"] },
+        { nombre: "Python", iconos: ["python"] },
       ],
     },
     {
@@ -82,10 +87,11 @@ export const datos = {
       ],
     },
     {
-      grupo: "Herramientas",
+      grupo: "Herramientas y diseño",
       items: [
         { nombre: "VS Code", iconos: ["vscode"] },
         { nombre: "Figma", iconos: ["figma"] },
+        { nombre: "Draw.io", iconos: ["diagramsdotnet"] },
         { nombre: "Microsoft Office", iconos: ["microsoft-office"] },
         { nombre: "Canva", iconos: ["canva"] },
       ],
@@ -93,15 +99,15 @@ export const datos = {
     {
       grupo: "Herramientas de IA",
       items: [
-        { nombre: "Grok Bot", iconos: ["grok-bot"] },
+        { nombre: "Grok Bot", iconos: ["grok-bot.webp"], icono: "img/icons/grok-bot.webp" },
         { nombre: "Cursor", iconos: ["cursor"] },
         { nombre: "NotebookLM", iconos: ["notebooklm"] },
         { nombre: "Gemini", iconos: ["gemini"] },
-        { nombre: "Gamma AI", iconos: ["gamma-ai"] },
+        { nombre: "Gamma AI", iconos: ["gamma-ai"], icono: "" }, // PENDIENTE: imagen que mande Joss
         { nombre: "Claude", iconos: ["claude"] },
         { nombre: "ChatGPT", iconos: ["chatgpt"] },
         { nombre: "Perplexity", iconos: ["perplexity"] },
-        { nombre: "Copilot", iconos: ["copilot"] },
+        { nombre: "Copilot", iconos: ["copilot"], icono: "" }, // PENDIENTE: imagen que mande Joss
       ],
     },
   ],
