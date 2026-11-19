@@ -605,7 +605,7 @@ function generarCV() {
   }
   if (datos.linkedin) {
     y = writeLines("LinkedIn:", rightX, y, { size: 9.5, color: ink, gap: 12, width: rightW });
-    writeLines(datos.linkedinTexto || datos.linkedin.replace(/^https?:\/\//, ""), rightX, y, { size: 9.5, color: ink, gap: 12, width: rightW });
+    writeLines(datos.linkedin.replace(/^https?:\/\//, "").replace(/^www\./, ""), rightX, y, { size: 9.5, color: ink, gap: 12, width: rightW });
   }
 
   doc.save(datos.cvArchivo);

@@ -10,8 +10,8 @@ export const datos = {
   correoLink: "mailto:Josepeemanuel@gmail.com",
   github: "https://github.com/Juju3-y",
   githubTexto: "github.com/Juju3-y",
-  linkedin: "", // PENDIENTE: pegar URL; si está vacío no se muestra
-  linkedinTexto: "", // ej. "linkedin.com/in/..."
+  linkedin: "https://www.linkedin.com/in/joseph-lacayo-30a873364",
+  linkedinTexto: "LinkedIn",
   perfil:
     "Estudiante técnico en Desarrollo Web y en soporte técnico y hardware, en formación en el CTP La Carpio (2022–2027). Tengo experiencia en ensamblaje y mantenimiento de computadoras, en atención al cliente y en proyectos de mantenimiento, armado y desarmado de computadoras e impresoras. Me interesa el soporte técnico, el desarrollo web, las redes y la ciberseguridad. No me enfoco solo en la tecnología: también me desempeño en otras áreas.",
   seo: {
