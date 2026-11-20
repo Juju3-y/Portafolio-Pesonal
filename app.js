@@ -33,12 +33,38 @@ function el(tag, attrs = {}, ...kids) {
   return n;
 }
 
-function btnCV(clase, compacto = false) {
+function grupoCV(compacto = false) {
+  const claseDiseno = compacto ? "btn btn-cv" : "btn btn-principal";
+  const claseATS = compacto ? "btn btn-cv btn-cv-alt" : "btn btn-secundario";
   return el(
-    "button",
-    { class: clase, type: "button", "aria-label": "Descargar CV", onClick: generarCV },
-    el("span", { class: "largo", text: "Descargar CV" }),
-    compacto && el("span", { class: "corto", text: "CV" }),
+    "div",
+    {
+      class: compacto ? "grupo-cv grupo-cv-barra" : "grupo-cv",
+      role: "group",
+      "aria-label": "Descargar currículum",
+    },
+    el(
+      "button",
+      {
+        class: claseDiseno,
+        type: "button",
+        "aria-label": "Descargar CV diseño",
+        onClick: generarCV,
+      },
+      el("span", { class: "largo", text: "CV diseño" }),
+      compacto && el("span", { class: "corto", text: "Diseño" }),
+    ),
+    el(
+      "button",
+      {
+        class: claseATS,
+        type: "button",
+        "aria-label": "Descargar CV simple ATS",
+        onClick: generarCVATS,
+      },
+      el("span", { class: "largo", text: "CV simple (ATS)" }),
+      compacto && el("span", { class: "corto", text: "ATS" }),
+    ),
   );
 }
 
@@ -177,7 +203,7 @@ function render() {
               ),
             ),
           ),
-        btnCV("btn btn-cv", true),
+        grupoCV(true),
       ),
       nav,
     ),
@@ -201,7 +227,7 @@ function render() {
       el(
         "div",
         { class: "acciones" },
-        btnCV("btn btn-principal"),
+        grupoCV(false),
         el("a", { class: "btn btn-secundario", href: datos.whatsapp, target: "_blank", rel: "noopener noreferrer", text: "Escribir por WhatsApp" }),
       ),
       redesActivas().length &&
@@ -559,7 +585,7 @@ function generarCV() {
       y = writeLines(ed.titulo, leftX, y, { size: 9.3, color: ink, gap: 11, width: leftW });
     }
     y = writeLines(ed.periodo, leftX, y, { size: 9, color: suave, gap: 11, width: leftW });
-    y += 8;
+    y += 11;
   }
 
   y += 2;
@@ -626,7 +652,155 @@ function generarCV() {
   }
 
   doc.save(datos.cvArchivo);
-  aviso.textContent = "El CV se descargó.";
+  aviso.textContent = "El CV diseño se descargó.";
+}
+function puntosParaATS(item) {
+  if (item.puntosATS && item.puntosATS.length) return item.puntosATS;
+  if (item.descripcionATS) return [item.descripcionATS];
+  if (item.puntos && item.puntos.length) return item.puntos;
+  if (item.descripcion) return [item.descripcion];
+  return [];
+}
+
+function generarCVATS() {
+  const doc = new jsPDF({ unit: "pt", format: "a4" });
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  const ink = [36, 48, 54];
+  const suave = [74, 91, 99];
+  const acento = [42, 74, 84];
+  const menta = [228, 238, 232];
+  const salvia = [197, 212, 203];
+  const margenX = 48;
+  const margenDer = pageW - 48;
+  const ancho = margenDer - margenX;
+
+  const font = (size, style = "normal") => {
+    doc.setFont("helvetica", style);
+    doc.setFontSize(size);
+  };
+
+  const clean = (s) => String(s).replace(/[–—]/g, "-");
+
+  const writeLines = (text, x, y, { size = 9.5, style = "normal", color = ink, gap = 11, width = ancho, align } = {}) => {
+    font(size, style);
+    doc.setTextColor(...color);
+    const rows = doc.splitTextToSize(clean(text), width);
+    for (const row of rows) {
+      if (align === "right") doc.text(row, x, y, { align: "right" });
+      else doc.text(row, x, y);
+      y += gap;
+    }
+    return y;
+  };
+
+  const seccion = (titulo, y) => {
+    y += 8;
+    font(10, "bold");
+    doc.setTextColor(...acento);
+    const label = clean(titulo).toUpperCase();
+    doc.text(label, margenX, y);
+    const tw = doc.getTextWidth(label);
+    doc.setDrawColor(...acento);
+    doc.setLineWidth(1.15);
+    doc.line(margenX, y + 3.5, margenX + Math.max(tw, 44), y + 3.5);
+    doc.setDrawColor(...salvia);
+    doc.setLineWidth(0.6);
+    doc.line(margenX + Math.max(tw, 44) + 8, y + 3.5, margenDer, y + 3.5);
+    return y + 16;
+  };
+
+  const tituloConFecha = (titulo, fecha, y) => {
+    const linea = fecha ? `${titulo}  ·  ${fecha}` : titulo;
+    return writeLines(linea, margenX, y, { size: 10, style: "bold", color: ink, gap: 12, width: ancho });
+  };
+
+  const linkLimpio = (url, texto) => {
+    if (!url) return "";
+    if (texto && !/^https?:\/\//i.test(texto) && texto !== "LinkedIn" && texto !== "GitHub") return texto;
+    return url.replace(/^https?:\/\//, "").replace(/^www\./, "");
+  };
+
+  const contacto1 = [datos.ciudad, datos.telefono, datos.correo].filter(Boolean).join("   ·   ");
+  const contacto2 = [linkLimpio(datos.linkedin, datos.linkedinTexto), linkLimpio(datos.github, datos.githubTexto)]
+    .filter(Boolean)
+    .join("   ·   ");
+
+  // Formas primero, luego el texto, para no tapar el orden de lectura
+  const headerH = 100;
+  doc.setFillColor(...menta);
+  doc.rect(0, 0, pageW, headerH, "F");
+  doc.setFillColor(...acento);
+  doc.rect(0, 0, pageW, 8, "F");
+  doc.setFillColor(...salvia);
+  doc.rect(0, headerH - 2, pageW, 2, "F");
+  doc.setFillColor(...acento);
+  doc.rect(0, pageH - 8, pageW, 8, "F");
+
+  let y = 32;
+  font(22, "bold");
+  doc.setTextColor(...ink);
+  doc.text(clean(datos.nombre).toUpperCase(), margenX, y);
+
+  y += 16;
+  y = writeLines(datos.titulo, margenX, y, { size: 10, color: acento, gap: 12, width: ancho });
+
+  y += 4;
+  y = writeLines(contacto1, margenX, y, { size: 9, color: suave, gap: 11, width: ancho });
+  if (contacto2) y = writeLines(contacto2, margenX, y, { size: 9, color: suave, gap: 11, width: ancho });
+
+  y = headerH + 18;
+  y = seccion("Perfil profesional", y);
+  y = writeLines(datos.perfil, margenX, y, { size: 9.4, color: ink, gap: 12, width: ancho });
+
+  y = seccion("Experiencia", y);
+  for (const exp of datos.experiencia) {
+    const cabeza = exp.lugar ? `${exp.puesto}  |  ${exp.lugar}` : exp.puesto;
+    y = tituloConFecha(cabeza, exp.periodo, y);
+    for (const p of puntosParaATS(exp)) {
+      y = writeLines("•  " + p, margenX + 8, y, { size: 9.2, color: ink, gap: 11, width: ancho - 8 });
+    }
+    y += 4;
+  }
+
+  if (datos.proyectos && datos.proyectos.length) {
+    y = seccion("Proyectos", y);
+    for (const proy of datos.proyectos) {
+      y = writeLines(proy.titulo, margenX, y, { size: 10, style: "bold", color: ink, gap: 12, width: ancho });
+      for (const p of puntosParaATS(proy)) {
+        y = writeLines("•  " + p, margenX + 8, y, { size: 9.2, color: ink, gap: 11, width: ancho - 8 });
+      }
+      y += 4;
+    }
+  }
+
+  y = seccion("Educación", y);
+  for (const ed of datos.educacion) {
+    const cabeza = ed.lugar ? `${ed.titulo}  |  ${ed.lugar}` : ed.titulo;
+    y = tituloConFecha(cabeza, ed.periodo, y);
+    y += 3;
+  }
+
+  y = seccion("Certificaciones", y);
+  for (const c of datos.certificaciones) {
+    y = writeLines(c.nombre, margenX, y, { size: 9.3, style: "bold", color: ink, gap: 11, width: ancho });
+    const extra = [c.emisor, c.fecha, c.detalle].filter(Boolean).join("  ·  ");
+    if (extra) y = writeLines(extra, margenX, y, { size: 8.7, color: suave, gap: 11, width: ancho });
+    y += 3;
+  }
+
+  y = seccion("Habilidades", y);
+  for (const g of datos.habilidades) {
+    const items = g.items.map(skillLabel).join(", ");
+    y = writeLines(`${g.grupo}: ${items}`, margenX, y, { size: 9.2, color: ink, gap: 12.5, width: ancho });
+  }
+
+  y = seccion("Idiomas", y);
+  const idiomas = datos.idiomas.map((i) => `${i.nombre}, ${i.nivel}`).join("   ·   ");
+  y = writeLines(idiomas, margenX, y, { size: 9.2, color: ink, gap: 11, width: ancho });
+
+  doc.save(datos.cvArchivoATS || "CV-Joseph-Lacayo-ATS.pdf");
+  aviso.textContent = "El CV simple (ATS) se descargó.";
 }
 
 render();

@@ -29,6 +29,11 @@ export const datos = {
         "Asistencia al cliente",
         "Marketing y automatización con IA para redes sociales",
       ],
+      puntosATS: [
+        "Apoyé a mecánicos.",
+        "Atendí a clientes.",
+        "Apoyé el marketing y automaticé procesos para redes sociales con IA.",
+      ],
     },
     {
       puesto: "Ensamblaje y mantenimiento de computadoras",
@@ -38,12 +43,18 @@ export const datos = {
         "Mantenimiento preventivo",
         "Diagnóstico de fallas de hardware",
       ],
+      puntosATS: [
+        "Desarmé y ensamblé computadoras.",
+        "Realicé mantenimiento preventivo.",
+        "Diagnostiqué fallas de hardware.",
+      ],
     },
     {
       puesto: "Atención al cliente",
       lugar: "",
       puntos: [],
       descripcion: "Experiencia en atención al cliente.",
+      puntosATS: ["Atendí a clientes."],
     },
   ],
   proyectos: [
@@ -51,6 +62,8 @@ export const datos = {
       titulo: "Mantenimiento de computadoras e impresoras",
       descripcion:
         "He realizado proyectos de mantenimiento de computadoras, armado y desarmado de computadoras e impresoras.",
+      descripcionATS:
+        "Realicé proyectos de mantenimiento, armado y desarmado de computadoras e impresoras.",
     },
   ],
   educacion: [
@@ -162,4 +175,5 @@ export const datos = {
   ],
   intereses: ["soporte técnico", "desarrollo web", "redes", "ciberseguridad"],
   cvArchivo: "CV-Joseph-Lacayo.pdf",
+  cvArchivoATS: "CV-Joseph-Lacayo-ATS.pdf",
 };

@@ -105,10 +105,35 @@ a:hover { color: var(--acento-hover); }
   min-width: 0;
 }
 
+.barra .grupo-cv {
+  flex-shrink: 0;
+}
+
 .barra .btn-cv {
   min-height: 48px;
-  padding: 0 20px;
-  flex-shrink: 0;
+  padding: 0 16px;
+}
+
+.barra .btn-cv-alt {
+  background: var(--menta);
+  color: var(--acento);
+}
+
+.barra .btn-cv-alt:hover {
+  background: var(--salvia);
+  color: var(--acento);
+}
+
+.grupo-cv {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.grupo-cv-barra {
+  flex-wrap: nowrap;
+  gap: 6px;
 }
 
 .marca {
@@ -253,7 +278,7 @@ main { padding-bottom: 72px; }
 
 .ciudad { margin: 0 0 24px; color: var(--suave); }
 
-.acciones { display: flex; flex-wrap: wrap; gap: 12px; }
+.acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
 
 section {
   position: relative;
@@ -442,9 +467,9 @@ section h2 {
 
   .nav a { min-height: 40px; }
 
-  .btn-cv .largo { display: none; }
-  .btn-cv .corto { display: inline; }
-  .barra .btn-cv { padding: 0 14px; }
+  .grupo-cv-barra .largo { display: none; }
+  .grupo-cv-barra .corto { display: inline; }
+  .barra .btn-cv { padding: 0 12px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -539,6 +564,8 @@ section h2 {
 
   .marca { font-size: 0.98rem; }
   .barra-fila { gap: 8px; min-height: 52px; }
+  .barra .btn-cv { min-height: 48px; padding: 0 10px; font-size: 0.88rem; }
+  .grupo-cv-barra { gap: 4px; }
 
   .nav {
     flex-wrap: nowrap;
