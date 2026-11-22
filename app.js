@@ -33,39 +33,93 @@ function el(tag, attrs = {}, ...kids) {
   return n;
 }
 
+let idiomaCV = "es";
+try {
+  const guardado = localStorage.getItem("idioma-cv");
+  if (guardado === "en" || guardado === "es") idiomaCV = guardado;
+} catch (e) { /* nada */ }
+
+function etiquetaDescarga(tipo) {
+  const en = idiomaCV === "en";
+  if (tipo === "diseno") return en ? "Descargar CV diseño en inglés" : "Descargar CV diseño";
+  return en ? "Descargar CV simple ATS en inglés" : "Descargar CV simple ATS";
+}
+
+function sincronizarIdiomaCV() {
+  for (const b of document.querySelectorAll(".selector-idioma [data-idioma]")) {
+    b.setAttribute("aria-pressed", b.dataset.idioma === idiomaCV ? "true" : "false");
+  }
+  for (const b of document.querySelectorAll("[data-cv]")) {
+    b.setAttribute("aria-label", etiquetaDescarga(b.dataset.cv));
+  }
+}
+
+function fijarIdiomaCV(idioma) {
+  if (idioma !== "es" && idioma !== "en") return;
+  idiomaCV = idioma;
+  try { localStorage.setItem("idioma-cv", idioma); } catch (e) { /* nada */ }
+  sincronizarIdiomaCV();
+}
+
+function selectorIdioma(compacto = false) {
+  return el(
+    "div",
+    {
+      class: compacto ? "selector-idioma selector-idioma-barra" : "selector-idioma",
+      role: "group",
+      "aria-label": "Idioma del currículum",
+    },
+    ["es", "en"].map((idioma) =>
+      el("button", {
+        type: "button",
+        "data-idioma": idioma,
+        "aria-pressed": idiomaCV === idioma ? "true" : "false",
+        "aria-label": idioma === "es" ? "ES, currículum en español" : "EN, currículum en inglés",
+        onClick: () => fijarIdiomaCV(idioma),
+        text: idioma.toUpperCase(),
+      }),
+    ),
+  );
+}
+
 function grupoCV(compacto = false) {
   const claseDiseno = compacto ? "btn btn-cv" : "btn btn-principal";
   const claseATS = compacto ? "btn btn-cv btn-cv-alt" : "btn btn-secundario";
   return el(
     "div",
-    {
-      class: compacto ? "grupo-cv grupo-cv-barra" : "grupo-cv",
-      role: "group",
-      "aria-label": "Descargar currículum",
-    },
+    { class: compacto ? "bloque-cv bloque-cv-barra" : "bloque-cv" },
+    selectorIdioma(compacto),
     el(
-      "button",
+      "div",
       {
-        class: claseDiseno,
-        type: "button",
-        "aria-label": "Descargar CV diseño",
-        "data-cv": "diseno",
-        onClick: (e) => conCarga(e.currentTarget, generarCV),
+        class: compacto ? "grupo-cv grupo-cv-barra" : "grupo-cv",
+        role: "group",
+        "aria-label": "Descargar currículum",
       },
-      el("span", { class: "largo", text: "CV diseño" }),
-      compacto && el("span", { class: "corto", text: "Diseño" }),
-    ),
-    el(
-      "button",
-      {
-        class: claseATS,
-        type: "button",
-        "aria-label": "Descargar CV simple ATS",
-        "data-cv": "ats",
-        onClick: (e) => conCarga(e.currentTarget, generarCVATS),
-      },
-      el("span", { class: "largo", text: "CV simple (ATS)" }),
-      compacto && el("span", { class: "corto", text: "ATS" }),
+      el(
+        "button",
+        {
+          class: claseDiseno,
+          type: "button",
+          "aria-label": etiquetaDescarga("diseno"),
+          "data-cv": "diseno",
+          onClick: (e) => conCarga(e.currentTarget, generarCV),
+        },
+        el("span", { class: "largo", text: "CV diseño" }),
+        compacto && el("span", { class: "corto", text: "Diseño" }),
+      ),
+      el(
+        "button",
+        {
+          class: claseATS,
+          type: "button",
+          "aria-label": etiquetaDescarga("ats"),
+          "data-cv": "ats",
+          onClick: (e) => conCarga(e.currentTarget, generarCVATS),
+        },
+        el("span", { class: "largo", text: "CV simple (ATS)" }),
+        compacto && el("span", { class: "corto", text: "ATS" }),
+      ),
     ),
   );
 }
@@ -417,11 +471,22 @@ function render() {
     "section",
     { class: "envoltorio", id: "habilidades" },
     figura("deco seccion-decor", svgCodigo),
-    el("h2", { text: "Habilidades" }),
+    el("h2", { text: "Habilidades técnicas" }),
     el(
       "div",
       { class: "grupos" },
       datos.habilidades.map((g) => el("article", { class: "tarjeta inclinable revelar" }, el("h3", { text: g.grupo }), chipList(g.items))),
+    ),
+  );
+
+  const habilidadesBlandas = el(
+    "section",
+    { class: "envoltorio", id: "habilidades-blandas" },
+    el("h2", { text: "Habilidades blandas" }),
+    el(
+      "article",
+      { class: "tarjeta revelar" },
+      chipList(datos.habilidadesBlandas.map((nombre) => ({ nombre }))),
     ),
   );
 
@@ -498,7 +563,7 @@ function render() {
 
   app.replaceChildren(
     header,
-    el("main", { id: "contenido" }, hero, sobre, experiencia, proyectos, educacion, habilidades, certificaciones, contacto),
+    el("main", { id: "contenido" }, hero, sobre, experiencia, proyectos, educacion, habilidades, habilidadesBlandas, certificaciones, contacto),
     footer,
   );
 }
@@ -507,7 +572,37 @@ function skillLabel(item) {
   return item.detalle ? `${item.nombre} (${item.detalle})` : item.nombre;
 }
 
+function datosParaCV(idioma = idiomaCV) {
+  if (idioma !== "en") return datos;
+  const en = datos.en;
+  return {
+    nombre: datos.nombre,
+    ciudad: datos.ciudad,
+    telefono: datos.telefono,
+    correo: datos.correo,
+    github: datos.github,
+    githubTexto: datos.githubTexto,
+    linkedin: datos.linkedin,
+    linkedinTexto: datos.linkedinTexto,
+    titulo: en.titulo,
+    perfil: en.perfil,
+    experiencia: en.experiencia,
+    proyectos: en.proyectos,
+    educacion: en.educacion,
+    habilidades: en.habilidades,
+    habilidadesBlandas: en.habilidadesBlandas,
+    certificaciones: en.certificaciones,
+    idiomas: en.idiomas,
+    tituloLineasCV: en.tituloLineasCV,
+    etiquetasCV: en.etiquetasCV,
+    cvArchivo: en.cvArchivo,
+    cvArchivoATS: en.cvArchivoATS,
+  };
+}
+
 function generarCV() {
+  const d = datosParaCV();
+  const et = d.etiquetasCV;
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
@@ -564,26 +659,30 @@ function generarCV() {
     font(11.5, "bold");
     y += 18;
     font(9.2, "normal");
-    y += doc.splitTextToSize(clean(datos.perfil), rightW).length * 11.5 + 18;
+    y += doc.splitTextToSize(clean(d.perfil), rightW).length * 11.5 + 14;
     font(11.5, "bold");
-    y += 16 + 16 + 4;
-    for (const g of datos.habilidades) {
+    y += 16 + 4;
+    for (const g of d.habilidades) {
       font(9, "bold");
       y += 13;
       const items = g.items.map(skillLabel).join(", ");
       font(8.8, "normal");
       y += doc.splitTextToSize("•  " + items, rightW).length * 11 + 5;
     }
-    y += 12;
+    y += 10;
+    font(11.5, "bold");
+    y += 16 + 3;
+    font(8.8, "normal");
+    y += doc.splitTextToSize("•  " + d.habilidadesBlandas.join(", "), rightW).length * 11 + 10;
     font(11.5, "bold");
     y += 16;
-    y += datos.idiomas.length * 12 + 6;
+    y += d.idiomas.length * 12 + 6;
     return y;
   };
 
   // Name then title; ribbon sits beside the title, like the template
   const nameY = 48;
-  const nameLines = clean(datos.nombre).toUpperCase().split(/\s+/);
+  const nameLines = clean(d.nombre).toUpperCase().split(/\s+/);
   const nameGap = 26;
   const titleY = nameY + nameGap * Math.max(nameLines.length, 1) + 10;
   const ribbonH = 50;
@@ -591,7 +690,7 @@ function generarCV() {
 
   const rightTextStart = ribbonY + ribbonH + 36;
   let chevronTop = Math.max(measureRight(rightTextStart) + 6, 530);
-  const contactMin = 148;
+  const contactMin = 168;
   if (chevronTop > pageH - contactMin) chevronTop = pageH - contactMin;
   const chevronDepth = 36;
   const chevronGap = 15;
@@ -636,16 +735,16 @@ function generarCV() {
   y = titleY;
   font(11, "normal");
   doc.setTextColor(...acento);
-  const titleLines = ["ESTUDIANTE TÉCNICO EN", "DESARROLLO WEB", "SOPORTE TÉCNICO Y HARDWARE"];
+  const titleLines = d.tituloLineasCV;
   for (const line of titleLines) {
     doc.text(line, leftX, y);
     y += 14;
   }
 
   y += 18;
-  y = heading("EXPERIENCIA", leftX, y, { size: 12 });
+  y = heading(et.experiencia, leftX, y, { size: 12 });
   y += 2;
-  for (const exp of datos.experiencia) {
+  for (const exp of d.experiencia) {
     const org = exp.lugar || exp.puesto;
     font(10, "bolditalic");
     doc.setTextColor(...ink);
@@ -658,7 +757,7 @@ function generarCV() {
       y = writeLines(exp.periodo, leftX, y, { size: 9, color: suave, gap: 11, width: leftW });
     }
     if (exp.lugar) {
-      y = writeLines("Cargo: " + exp.puesto, leftX, y, { size: 9.5, color: ink, gap: 11, width: leftW });
+      y = writeLines(et.cargo + exp.puesto, leftX, y, { size: 9.5, color: ink, gap: 11, width: leftW });
     } else if (exp.descripcion) {
       y = writeLines(exp.descripcion, leftX, y, { size: 9.5, color: ink, gap: 11, width: leftW });
     }
@@ -669,9 +768,9 @@ function generarCV() {
   }
 
   y += 2;
-  y = heading("EDUCACIÓN", leftX, y, { size: 12 });
+  y = heading(et.educacion, leftX, y, { size: 12 });
   y += 2;
-  for (const ed of datos.educacion) {
+  for (const ed of d.educacion) {
     font(10, "bolditalic");
     doc.setTextColor(...ink);
     const head = clean(ed.lugar || ed.titulo).toUpperCase();
@@ -687,9 +786,9 @@ function generarCV() {
   }
 
   y += 2;
-  y = heading("CERTIFICACIONES", leftX, y, { size: 12 });
+  y = heading(et.certificaciones, leftX, y, { size: 12 });
   y += 2;
-  for (const c of datos.certificaciones) {
+  for (const c of d.certificaciones) {
     font(9.2, "bolditalic");
     doc.setTextColor(...ink);
     const nameRows = doc.splitTextToSize(clean(c.nombre).toUpperCase(), leftW);
@@ -704,15 +803,14 @@ function generarCV() {
 
   // ----- RIGHT COLUMN TEXT -----
   y = rightTextStart;
-  y = heading("SOBRE MÍ", rightX, y, { size: 12 });
+  y = heading(et.sobreMi, rightX, y, { size: 12 });
   y += 3;
-  y = writeLines(datos.perfil, rightX, y, { size: 9.2, color: ink, gap: 11.5, width: rightW });
+  y = writeLines(d.perfil, rightX, y, { size: 9.2, color: ink, gap: 11.5, width: rightW });
 
-  y += 18;
-  y = heading("HABILIDADES", rightX, y, { size: 12 });
-  y = heading("Y HERRAMIENTAS", rightX, y, { size: 12 });
+  y += 14;
+  y = heading(et.habilidadesTecnicas, rightX, y, { size: 12 });
   y += 3;
-  for (const g of datos.habilidades) {
+  for (const g of d.habilidades) {
     font(8.8, "bold");
     doc.setTextColor(...acento);
     doc.text(g.grupo, rightX, y);
@@ -722,36 +820,41 @@ function generarCV() {
     y += 6;
   }
 
+  y += 8;
+  y = heading(et.habilidadesBlandas, rightX, y, { size: 12 });
+  y += 3;
+  y = writeLines("•  " + d.habilidadesBlandas.join(", "), rightX, y, { size: 8.8, color: ink, gap: 11, width: rightW });
+
   y += 10;
-  y = heading("IDIOMAS", rightX, y, { size: 12 });
+  y = heading(et.idiomas, rightX, y, { size: 12 });
   y += 2;
-  for (const i of datos.idiomas) {
+  for (const i of d.idiomas) {
     y = writeLines(`•  ${i.nombre}, ${i.nivel}`, rightX, y, { size: 9.2, color: ink, gap: 12, width: rightW });
   }
 
-  y = chevronTop + chevronDepth + chevronGap + 28;
-  y = heading("CONTACTO", rightX, y, { size: 12 });
-  y += 6;
-  y = writeLines("Teléfono:", rightX, y, { size: 9.5, color: ink, gap: 12, width: rightW });
-  y = writeLines(datos.telefono, rightX, y, { size: 9.5, color: ink, gap: 16, width: rightW });
-  y = writeLines("Correo:", rightX, y, { size: 9.5, color: ink, gap: 12, width: rightW });
-  y = writeLines(datos.correo, rightX, y, { size: 9.5, color: ink, gap: 16, width: rightW });
-  y = writeLines("WhatsApp:", rightX, y, { size: 9.5, color: ink, gap: 12, width: rightW });
-  y = writeLines(datos.telefono, rightX, y, { size: 9.5, color: ink, gap: 16, width: rightW });
-  y = writeLines("Dirección:", rightX, y, { size: 9.5, color: ink, gap: 12, width: rightW });
-  y = writeLines(datos.ciudad, rightX, y, { size: 9.5, color: ink, gap: 16, width: rightW });
-  if (datos.github) {
-    y = writeLines("GitHub:", rightX, y, { size: 9.5, color: ink, gap: 12, width: rightW });
-    y = writeLines(datos.githubTexto || datos.github.replace(/^https?:\/\//, ""), rightX, y, { size: 9.5, color: ink, gap: 16, width: rightW });
+  y = chevronTop + chevronDepth + chevronGap + 22;
+  y = heading(et.contacto, rightX, y, { size: 12 });
+  y += 4;
+  const contactos = [
+    [et.telefono, d.telefono],
+    [et.correo, d.correo],
+    [et.whatsapp, d.telefono],
+    [et.direccion, d.ciudad],
+  ];
+  if (d.github) {
+    contactos.push(["GitHub:", d.githubTexto || d.github.replace(/^https?:\/\//, "")]);
   }
-  if (datos.linkedin) {
-    y = writeLines("LinkedIn:", rightX, y, { size: 9.5, color: ink, gap: 12, width: rightW });
-    writeLines(datos.linkedin.replace(/^https?:\/\//, "").replace(/^www\./, ""), rightX, y, { size: 9.5, color: ink, gap: 12, width: rightW });
+  if (d.linkedin) {
+    contactos.push(["LinkedIn:", d.linkedin.replace(/^https?:\/\//, "").replace(/^www\./, "")]);
+  }
+  for (const [lab, val] of contactos) {
+    y = writeLines(`${lab} ${val}`, rightX, y, { size: 9, color: ink, gap: 12.5, width: rightW });
   }
 
-  doc.save(datos.cvArchivo);
-  aviso.textContent = "El CV diseño se descargó.";
+  doc.save(d.cvArchivo);
+  aviso.textContent = idiomaCV === "en" ? "El CV diseño en inglés se descargó." : "El CV diseño se descargó.";
 }
+
 function puntosParaATS(item) {
   if (item.puntosATS && item.puntosATS.length) return item.puntosATS;
   if (item.descripcionATS) return [item.descripcionATS];
@@ -761,6 +864,8 @@ function puntosParaATS(item) {
 }
 
 function generarCVATS() {
+  const d = datosParaCV();
+  const et = d.etiquetasCV;
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
@@ -819,8 +924,8 @@ function generarCVATS() {
     return url.replace(/^https?:\/\//, "").replace(/^www\./, "");
   };
 
-  const contacto1 = [datos.ciudad, datos.telefono, datos.correo].filter(Boolean).join("   ·   ");
-  const contacto2 = [linkLimpio(datos.linkedin, datos.linkedinTexto), linkLimpio(datos.github, datos.githubTexto)]
+  const contacto1 = [d.ciudad, d.telefono, d.correo].filter(Boolean).join("   ·   ");
+  const contacto2 = [linkLimpio(d.linkedin, d.linkedinTexto), linkLimpio(d.github, d.githubTexto)]
     .filter(Boolean)
     .join("   ·   ");
 
@@ -838,21 +943,21 @@ function generarCVATS() {
   let y = 32;
   font(22, "bold");
   doc.setTextColor(...ink);
-  doc.text(clean(datos.nombre).toUpperCase(), margenX, y);
+  doc.text(clean(d.nombre).toUpperCase(), margenX, y);
 
   y += 16;
-  y = writeLines(datos.titulo, margenX, y, { size: 10, color: acento, gap: 12, width: ancho });
+  y = writeLines(d.titulo, margenX, y, { size: 10, color: acento, gap: 12, width: ancho });
 
   y += 4;
   y = writeLines(contacto1, margenX, y, { size: 9, color: suave, gap: 11, width: ancho });
   if (contacto2) y = writeLines(contacto2, margenX, y, { size: 9, color: suave, gap: 11, width: ancho });
 
   y = headerH + 18;
-  y = seccion("Perfil profesional", y);
-  y = writeLines(datos.perfil, margenX, y, { size: 9.4, color: ink, gap: 12, width: ancho });
+  y = seccion(et.perfilProfesional, y);
+  y = writeLines(d.perfil, margenX, y, { size: 9.4, color: ink, gap: 12, width: ancho });
 
-  y = seccion("Experiencia", y);
-  for (const exp of datos.experiencia) {
+  y = seccion(et.experiencia, y);
+  for (const exp of d.experiencia) {
     const cabeza = exp.lugar ? `${exp.puesto}  |  ${exp.lugar}` : exp.puesto;
     y = tituloConFecha(cabeza, exp.periodo, y);
     for (const p of puntosParaATS(exp)) {
@@ -861,9 +966,9 @@ function generarCVATS() {
     y += 4;
   }
 
-  if (datos.proyectos && datos.proyectos.length) {
-    y = seccion("Proyectos", y);
-    for (const proy of datos.proyectos) {
+  if (d.proyectos && d.proyectos.length) {
+    y = seccion(et.proyectos, y);
+    for (const proy of d.proyectos) {
       y = writeLines(proy.titulo, margenX, y, { size: 10, style: "bold", color: ink, gap: 12, width: ancho });
       for (const p of puntosParaATS(proy)) {
         y = writeLines("•  " + p, margenX + 8, y, { size: 9.2, color: ink, gap: 11, width: ancho - 8 });
@@ -872,33 +977,36 @@ function generarCVATS() {
     }
   }
 
-  y = seccion("Educación", y);
-  for (const ed of datos.educacion) {
+  y = seccion(et.educacion, y);
+  for (const ed of d.educacion) {
     const cabeza = ed.lugar ? `${ed.titulo}  |  ${ed.lugar}` : ed.titulo;
     y = tituloConFecha(cabeza, ed.periodo, y);
     y += 3;
   }
 
-  y = seccion("Certificaciones", y);
-  for (const c of datos.certificaciones) {
+  y = seccion(et.certificaciones, y);
+  for (const c of d.certificaciones) {
     y = writeLines(c.nombre, margenX, y, { size: 9.3, style: "bold", color: ink, gap: 11, width: ancho });
     const extra = [c.emisor, c.fecha, c.detalle].filter(Boolean).join("  ·  ");
     if (extra) y = writeLines(extra, margenX, y, { size: 8.7, color: suave, gap: 11, width: ancho });
     y += 3;
   }
 
-  y = seccion("Habilidades", y);
-  for (const g of datos.habilidades) {
+  y = seccion(et.habilidadesTecnicas, y);
+  for (const g of d.habilidades) {
     const items = g.items.map(skillLabel).join(", ");
     y = writeLines(`${g.grupo}: ${items}`, margenX, y, { size: 9.2, color: ink, gap: 12.5, width: ancho });
   }
 
-  y = seccion("Idiomas", y);
-  const idiomas = datos.idiomas.map((i) => `${i.nombre}, ${i.nivel}`).join("   ·   ");
+  y = seccion(et.habilidadesBlandas, y);
+  y = writeLines(d.habilidadesBlandas.join(", "), margenX, y, { size: 9.2, color: ink, gap: 12, width: ancho });
+
+  y = seccion(et.idiomas, y);
+  const idiomas = d.idiomas.map((i) => `${i.nombre}, ${i.nivel}`).join("   ·   ");
   y = writeLines(idiomas, margenX, y, { size: 9.2, color: ink, gap: 11, width: ancho });
 
-  doc.save(datos.cvArchivoATS || "CV-Joseph-Lacayo-ATS.pdf");
-  aviso.textContent = "El CV simple (ATS) se descargó.";
+  doc.save(d.cvArchivoATS || "CV-Joseph-Lacayo-ATS.pdf");
+  aviso.textContent = idiomaCV === "en" ? "El CV simple (ATS) en inglés se descargó." : "El CV simple (ATS) se descargó.";
 }
 
 const sinMovimiento = window.matchMedia("(prefers-reduced-motion: reduce)");

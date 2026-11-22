@@ -148,7 +148,8 @@ a:hover { color: var(--enlace-hover); }
 .btn:focus-visible,
 .nav a:focus-visible,
 .red-enlace:focus-visible,
-.btn-tema:focus-visible {
+.btn-tema:focus-visible,
+.selector-idioma button:focus-visible {
   outline: 3px solid var(--foco);
   outline-offset: 3px;
   border-radius: inherit;
@@ -216,6 +217,63 @@ a:hover { color: var(--enlace-hover); }
   gap: var(--e-2);
 }
 .grupo-cv-barra { flex-wrap: nowrap; gap: 6px; }
+
+.bloque-cv {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e-3);
+}
+.bloque-cv-barra {
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+  gap: 6px;
+}
+
+.selector-idioma {
+  display: inline-flex;
+  align-items: stretch;
+  flex-shrink: 0;
+  padding: 3px;
+  border-radius: var(--pill);
+  background: var(--menta);
+  box-shadow: inset 0 0 0 1px var(--borde);
+}
+.selector-idioma button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  min-height: calc(var(--alto-btn-l) - 6px);
+  padding: 0 10px;
+  border: 0;
+  border-radius: var(--pill);
+  background: transparent;
+  color: var(--suave);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background-color var(--rapido) ease, color var(--rapido) ease;
+}
+.selector-idioma-barra button {
+  min-width: 36px;
+  min-height: calc(var(--alto-btn) - 6px);
+  padding: 0 8px;
+  font-size: 0.75rem;
+}
+.selector-idioma button:hover { color: var(--tinta); }
+.selector-idioma button[aria-pressed="true"] {
+  background: var(--acento);
+  color: var(--sobre-acento);
+}
+.selector-idioma button:active { scale: 0.97; }
+.selector-idioma button:focus-visible {
+  outline: 3px solid var(--foco);
+  outline-offset: 2px;
+  border-radius: inherit;
+}
 
 .marca {
   margin-right: auto;
@@ -616,6 +674,10 @@ section h2 { margin: 0 0 var(--e-4); font-size: 1.6rem; letter-spacing: -0.02em;
   .grupo-cv-barra .largo { display: none; }
   .grupo-cv-barra .corto { display: inline; }
   .barra .btn-cv { padding: 0 var(--e-3); }
+  .bloque-cv-barra .selector-idioma button {
+    min-width: 32px;
+    padding: 0 6px;
+  }
 }
 
 @media (max-width: 600px) {
@@ -625,10 +687,18 @@ section h2 { margin: 0 0 var(--e-4); font-size: 1.6rem; letter-spacing: -0.02em;
   #certificaciones h2,
   #contacto h2 { padding-right: 0; }
   :root { --barra-hueco: 140px; }
-  .marca { font-size: 0.98rem; }
-  .barra-fila { gap: var(--e-2); min-height: 52px; }
-  .barra .btn-cv { min-height: var(--alto-btn); padding: 0 10px; font-size: 0.88rem; }
+  .marca { font-size: 0.95rem; }
+  .barra-fila { gap: 6px; min-height: 52px; }
+  .barra .btn-cv { min-height: var(--alto-btn); padding: 0 9px; font-size: 0.86rem; }
   .grupo-cv-barra { gap: var(--e-1); }
+  .bloque-cv-barra { gap: 4px; }
+  .barra .selector-idioma { padding: 2px; }
+  .barra .selector-idioma button {
+    min-width: 28px;
+    min-height: calc(var(--alto-btn) - 8px);
+    padding: 0 5px;
+    font-size: 0.7rem;
+  }
   .btn-tema { width: 44px; height: 44px; }
   .nav {
     flex-wrap: nowrap;
@@ -643,6 +713,7 @@ section h2 { margin: 0 0 var(--e-4); font-size: 1.6rem; letter-spacing: -0.02em;
 @media (max-width: 360px) {
   .marca { font-size: 0.9rem; }
   .barra .btn-cv { padding: 0 8px; font-size: 0.82rem; }
+  .barra .selector-idioma button { min-width: 26px; padding: 0 4px; font-size: 0.68rem; }
   .btn-tema { width: 44px; height: 44px; }
 }
 
