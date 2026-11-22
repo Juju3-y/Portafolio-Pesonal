@@ -7,6 +7,17 @@
     <meta name="description" content="Portafolio de Joseph Lacayo, estudiante técnico en Desarrollo Web y soporte técnico en San José, Costa Rica." />
     <meta name="author" content="Joseph Lacayo" />
     <meta name="theme-color" content="#2A4A54" />
+    <meta name="color-scheme" content="light dark" />
+    <script>
+      (function () {
+        var t = null;
+        try { t = localStorage.getItem("tema"); } catch (e) {}
+        if (t !== "oscuro" && t !== "claro") {
+          t = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "oscuro" : "claro";
+        }
+        document.documentElement.setAttribute("data-tema", t);
+      })();
+    </script>
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Joseph Lacayo · Desarrollo Web y soporte técnico" />
     <meta property="og:description" content="Portafolio de Joseph Lacayo, estudiante técnico en Desarrollo Web y soporte técnico en San José, Costa Rica." />

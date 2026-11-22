@@ -49,7 +49,8 @@ function grupoCV(compacto = false) {
         class: claseDiseno,
         type: "button",
         "aria-label": "Descargar CV diseño",
-        onClick: generarCV,
+        "data-cv": "diseno",
+        onClick: (e) => conCarga(e.currentTarget, generarCV),
       },
       el("span", { class: "largo", text: "CV diseño" }),
       compacto && el("span", { class: "corto", text: "Diseño" }),
@@ -60,13 +61,100 @@ function grupoCV(compacto = false) {
         class: claseATS,
         type: "button",
         "aria-label": "Descargar CV simple ATS",
-        onClick: generarCVATS,
+        "data-cv": "ats",
+        onClick: (e) => conCarga(e.currentTarget, generarCVATS),
       },
       el("span", { class: "largo", text: "CV simple (ATS)" }),
       compacto && el("span", { class: "corto", text: "ATS" }),
     ),
   );
 }
+
+
+let generando = false;
+
+function esperarPintado() {
+  return new Promise((r) => requestAnimationFrame(() => setTimeout(r, 30)));
+}
+
+async function conCarga(boton, generar) {
+  if (generando) return;
+  generando = true;
+  const botones = [...document.querySelectorAll("[data-cv]")];
+  const guardado = new Map();
+  for (const b of botones) {
+    guardado.set(b, b.innerHTML);
+    b.disabled = true;
+    b.setAttribute("aria-busy", "true");
+  }
+  const tipo = boton.dataset.cv;
+  for (const b of botones.filter((x) => x.dataset.cv === tipo)) {
+    b.classList.add("cargando");
+    const compacto = b.closest(".grupo-cv-barra");
+    const partes = [
+      el("span", { class: "spinner", "aria-hidden": "true" }),
+      el("span", { class: compacto ? "largo" : null, text: "Generando…" }),
+    ];
+    if (compacto) partes.push(el("span", { class: "corto", text: "…" }));
+    b.replaceChildren(...partes);
+  }
+  aviso.textContent = "Generando el CV, un momento…";
+  const inicio = performance.now();
+  try {
+    await esperarPintado();
+    generar();
+  } catch (err) {
+    console.error(err);
+    aviso.textContent = "No se pudo generar el CV. Probá de nuevo.";
+  } finally {
+    const resta = 450 - (performance.now() - inicio);
+    if (resta > 0) await new Promise((r) => setTimeout(r, resta));
+    for (const b of botones) {
+      b.innerHTML = guardado.get(b);
+      b.disabled = false;
+      b.removeAttribute("aria-busy");
+      b.classList.remove("cargando");
+    }
+    generando = false;
+  }
+}
+
+const svgLuna = `<svg class="ico-luna" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>`;
+const svgSol = `<svg class="ico-sol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>`;
+
+function temaActual() {
+  return document.documentElement.dataset.tema === "oscuro" ? "oscuro" : "claro";
+}
+
+function aplicarTema(tema, guardar) {
+  const raiz = document.documentElement;
+  raiz.dataset.tema = tema;
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute("content", tema === "oscuro" ? "#11191C" : "#2A4A54");
+  for (const b of document.querySelectorAll(".btn-tema")) {
+    b.setAttribute("aria-pressed", tema === "oscuro" ? "true" : "false");
+    b.title = tema === "oscuro" ? "Cambiar a modo claro" : "Cambiar a modo oscuro";
+  }
+  if (guardar) {
+    try { localStorage.setItem("tema", tema); } catch (e) { /* sin almacenamiento */ }
+  }
+}
+
+function botonTema() {
+  const b = el("button", {
+    class: "btn-tema",
+    type: "button",
+    "aria-label": "Modo oscuro",
+    "aria-pressed": temaActual() === "oscuro" ? "true" : "false",
+    onClick: () => aplicarTema(temaActual() === "oscuro" ? "claro" : "oscuro", true),
+  });
+  b.innerHTML = svgLuna + svgSol;
+  return b;
+}
+
+const cubo3d = `<div class="cubo-giro"><span class="cara cara-frente">&lt;/&gt;</span><span class="cara cara-atras">{ }</span><span class="cara cara-der">JS</span><span class="cara cara-izq">PHP</span><span class="cara cara-arriba"></span><span class="cara cara-abajo"></span></div><span class="orbita"></span>`;
+
+const pila3d = `<div class="pila"><span class="capa" style="--n:0"></span><span class="capa" style="--n:1"></span><span class="capa" style="--n:2"></span></div>`;
 
 const iconosInteres = {
   "soporte técnico": "soporte-tecnico",
@@ -163,7 +251,9 @@ function figura(clase, markup) {
 
 function capaDecor(claseCapa, piezas) {
   const capa = el("div", { class: claseCapa, "aria-hidden": "true" });
-  for (const [clase, svg] of piezas) capa.append(figura(clase, svg));
+  const escena = el("div", { class: "escena3d" });
+  for (const [clase, svg] of piezas) escena.append(figura(clase, svg));
+  capa.append(escena);
   return capa;
 }
 
@@ -203,6 +293,7 @@ function render() {
               ),
             ),
           ),
+        botonTema(),
         grupoCV(true),
       ),
       nav,
@@ -217,6 +308,7 @@ function render() {
       ["deco deco-engranaje", svgEngranaje],
       ["deco deco-usb", svgUsb],
       ["deco deco-codigo", svgCodigo],
+      ["deco cubo3d", cubo3d],
     ]),
     el(
       "div",
@@ -255,10 +347,10 @@ function render() {
     "section",
     { class: "envoltorio", id: "sobre-mi" },
     el("h2", { text: "Sobre mí" }),
-    el("p", { class: "lead", text: datos.perfil }),
+    el("p", { class: "lead revelar", text: datos.perfil }),
     el(
       "ul",
-      { class: "metas" },
+      { class: "metas revelar" },
       datos.idiomas.map((i) => el("li", { text: `${i.nombre} ${i.nivel}` })),
       datos.intereses.map((i) =>
         chip(i.charAt(0).toUpperCase() + i.slice(1), iconosInteres[i] ? [iconosInteres[i]] : []),
@@ -277,7 +369,7 @@ function render() {
       datos.experiencia.map((exp) =>
         el(
           "article",
-          { class: "tarjeta" },
+          { class: "tarjeta destacada inclinable revelar" },
           el("h3", { text: exp.puesto }),
           exp.lugar && el("p", { class: "lugar", text: exp.lugar }),
           exp.periodo && el("p", { class: "fecha", text: exp.periodo }),
@@ -298,7 +390,7 @@ function render() {
       "div",
       { class: "rejilla una" },
       datos.proyectos.map((p) =>
-        el("article", { class: "tarjeta" }, el("h3", { text: p.titulo }), el("p", { text: p.descripcion })),
+        el("article", { class: "tarjeta destacada inclinable revelar" }, el("h3", { text: p.titulo }), el("p", { text: p.descripcion })),
       ),
     ),
   );
@@ -309,7 +401,7 @@ function render() {
     el("h2", { text: "Educación" }),
     el(
       "article",
-      { class: "tarjeta" },
+      { class: "tarjeta inclinable revelar" },
       datos.educacion.map((ed) =>
         el(
           "div",
@@ -329,7 +421,7 @@ function render() {
     el(
       "div",
       { class: "grupos" },
-      datos.habilidades.map((g) => el("article", { class: "tarjeta" }, el("h3", { text: g.grupo }), chipList(g.items))),
+      datos.habilidades.map((g) => el("article", { class: "tarjeta inclinable revelar" }, el("h3", { text: g.grupo }), chipList(g.items))),
     ),
   );
 
@@ -340,7 +432,7 @@ function render() {
     el("h2", { text: "Certificaciones" }),
     el(
       "div",
-      { class: "tarjeta" },
+      { class: "tarjeta revelar" },
       datos.certificaciones.map((c) =>
         el(
           "article",
@@ -367,11 +459,12 @@ function render() {
   const contacto = el(
     "section",
     { class: "envoltorio", id: "contacto" },
+    figura("pila3d", pila3d),
     el("h2", { text: "Contacto" }),
     el("p", { class: "lead", text: "Si querés hablar sobre un proyecto, escribime." }),
     el(
       "div",
-      { class: "tarjeta contacto-lista" },
+      { class: "tarjeta contacto-lista revelar" },
       el("p", {}, "Correo: ", el("a", { href: datos.correoLink, text: datos.correo })),
       el("p", {}, "Teléfono: ", el("a", { href: datos.telefonoLink, text: datos.telefono })),
       el("p", {}, "WhatsApp: ", el("a", { href: datos.whatsapp, target: "_blank", rel: "noopener noreferrer", text: datos.telefono })),
@@ -395,7 +488,12 @@ function render() {
   const footer = el(
     "footer",
     { class: "pie" },
-    el("div", { class: "envoltorio", text: `${datos.nombre} · ${datos.ciudad}` }),
+    el(
+      "div",
+      { class: "envoltorio pie-dentro" },
+      el("span", { text: `${datos.nombre} · ${datos.ciudad}` }),
+      el("a", { href: "privacidad.html", text: "Privacidad" }),
+    ),
   );
 
   app.replaceChildren(
@@ -803,4 +901,122 @@ function generarCVATS() {
   aviso.textContent = "El CV simple (ATS) se descargó.";
 }
 
+const sinMovimiento = window.matchMedia("(prefers-reduced-motion: reduce)");
+const punteroFino = window.matchMedia("(hover: hover) and (pointer: fine)");
+
+function iniciarRevelado() {
+  const items = [...document.querySelectorAll(".revelar")];
+  const destacadas = [...document.querySelectorAll(".destacada")];
+  if (sinMovimiento.matches || !("IntersectionObserver" in window)) {
+    for (const n of items.concat(destacadas)) n.classList.add("visible", "en-vista");
+    return;
+  }
+  // índice para escalonar dentro de cada grupo
+  for (const n of items) {
+    const hermanos = [...n.parentElement.children].filter((x) => x.classList.contains("revelar"));
+    n.style.setProperty("--i", String(Math.min(hermanos.indexOf(n), 4)));
+  }
+  document.documentElement.classList.add("anim");
+  const io = new IntersectionObserver(
+    (entradas) => {
+      for (const e of entradas) {
+        const n = e.target;
+        if (n.classList.contains("destacada")) n.classList.toggle("en-vista", e.isIntersecting);
+        if (e.isIntersecting && n.classList.contains("revelar")) {
+          n.classList.add("visible");
+          if (!n.classList.contains("destacada")) io.unobserve(n);
+        }
+      }
+    },
+    { rootMargin: "0px 0px -8% 0px", threshold: 0.08 },
+  );
+  for (const n of new Set(items.concat(destacadas))) io.observe(n);
+}
+
+function iniciarTilt() {
+  if (sinMovimiento.matches || !punteroFino.matches) return;
+  document.documentElement.classList.add("tilt");
+  for (const card of document.querySelectorAll(".inclinable")) {
+    let marco = 0;
+    card.addEventListener("pointermove", (ev) => {
+      const r = card.getBoundingClientRect();
+      const x = (ev.clientX - r.left) / r.width;
+      const y = (ev.clientY - r.top) / r.height;
+      cancelAnimationFrame(marco);
+      marco = requestAnimationFrame(() => {
+        card.classList.add("moviendo");
+        const fuerza = r.width > 700 ? 3 : 6;
+        card.style.setProperty("--ry", ((x - 0.5) * fuerza * 2).toFixed(2) + "deg");
+        card.style.setProperty("--rx", ((0.5 - y) * fuerza * 2).toFixed(2) + "deg");
+        card.style.setProperty("--mx", (x * 100).toFixed(1) + "%");
+        card.style.setProperty("--my", (y * 100).toFixed(1) + "%");
+      });
+    });
+    card.addEventListener("pointerleave", () => {
+      cancelAnimationFrame(marco);
+      card.classList.remove("moviendo");
+      card.style.setProperty("--rx", "0deg");
+      card.style.setProperty("--ry", "0deg");
+    });
+  }
+}
+
+function iniciarParallax() {
+  if (sinMovimiento.matches || !punteroFino.matches) return;
+  const hero = document.querySelector(".hero");
+  if (!hero) return;
+  let marco = 0;
+  hero.addEventListener("pointermove", (ev) => {
+    const r = hero.getBoundingClientRect();
+    const px = ((ev.clientX - r.left) / r.width - 0.5) * 2;
+    const py = ((ev.clientY - r.top) / r.height - 0.5) * 2;
+    cancelAnimationFrame(marco);
+    marco = requestAnimationFrame(() => {
+      hero.style.setProperty("--px", px.toFixed(3));
+      hero.style.setProperty("--py", py.toFixed(3));
+    });
+  });
+  hero.addEventListener("pointerleave", () => {
+    hero.style.setProperty("--px", "0");
+    hero.style.setProperty("--py", "0");
+  });
+}
+
+function iniciarNavActiva() {
+  if (!("IntersectionObserver" in window)) return;
+  const enlaces = new Map(
+    [...document.querySelectorAll(".nav a")].map((a) => [a.getAttribute("href").slice(1), a]),
+  );
+  const io = new IntersectionObserver(
+    (entradas) => {
+      for (const e of entradas) {
+        if (!e.isIntersecting) continue;
+        for (const a of enlaces.values()) a.removeAttribute("aria-current");
+        const a = enlaces.get(e.target.id);
+        if (a) a.setAttribute("aria-current", "true");
+      }
+    },
+    { rootMargin: "-45% 0px -50% 0px" },
+  );
+  for (const id of enlaces.keys()) {
+    const s = document.getElementById(id);
+    if (s) io.observe(s);
+  }
+}
+
+function iniciarTemaSistema() {
+  const mq = window.matchMedia("(prefers-color-scheme: dark)");
+  mq.addEventListener?.("change", (e) => {
+    let guardado = null;
+    try { guardado = localStorage.getItem("tema"); } catch (err) { /* nada */ }
+    if (!guardado) aplicarTema(e.matches ? "oscuro" : "claro", false);
+  });
+}
+
 render();
+aplicarTema(temaActual(), false);
+iniciarRevelado();
+iniciarTilt();
+iniciarParallax();
+iniciarNavActiva();
+iniciarTemaSistema();

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es-CR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Privacidad · Joseph Lacayo</title>
+    <meta name="description" content="Aviso de privacidad del portafolio de Joseph Lacayo: sin cookies ni analítica." />
+    <meta name="author" content="Joseph Lacayo" />
+    <meta name="theme-color" content="#2A4A54" />
+    <meta name="color-scheme" content="light dark" />
+    <script>
+      (function () {
+        var t = null;
+        try { t = localStorage.getItem("tema"); } catch (e) {}
+        if (t !== "oscuro" && t !== "claro") {
+          t = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "oscuro" : "claro";
+        }
+        document.documentElement.setAttribute("data-tema", t);
+      })();
+    </script>
+    <link rel="canonical" href="https://joseph-lacayo.vercel.app/privacidad.html" />
+    <link rel="icon" href="/img/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/img/favicon.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/img/apple-touch.png" />
+    <link rel="stylesheet" href="/estilos.css" />
+  </head>
+  <body class="pagina-simple">
+    <a class="saltar" href="#contenido">Saltar al contenido</a>
+    <header class="barra barra-simple">
+      <div class="envoltorio barra-dentro">
+        <div class="barra-fila">
+          <a class="marca" href="/">Joseph Lacayo</a>
+          <button class="btn-tema" type="button" aria-label="Modo oscuro" aria-pressed="false"><svg class="ico-luna" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg><svg class="ico-sol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg></button>
+        </div>
+      </div>
+    </header>
+    <main id="contenido" class="envoltorio">
+      <article class="tarjeta">
+        <h1>Aviso de privacidad</h1>
+        <p>Este sitio no usa cookies ni herramientas de analítica o seguimiento, y no tiene formularios que recojan datos.</p>
+        <p>Lo único que se guarda es tu preferencia de tema (claro u oscuro), y solo en tu propio navegador, para que la página la recuerde. No se envía a ningún lado.</p>
+        <p>El correo, el teléfono y el WhatsApp que aparecen en el portafolio están ahí solo para contacto profesional. Por favor, no los uses para publicidad ni los compartas con terceros.</p>
+        <p>El CV se genera en tu navegador al tocar el botón de descarga; no pasa por ningún servidor.</p>
+        <div class="acciones">
+          <a class="btn btn-principal" href="/">Volver al portafolio</a>
+        </div>
+      </article>
+    </main>
+    <footer class="pie">
+      <div class="envoltorio pie-dentro">
+        <span>Joseph Lacayo · San José, Costa Rica</span>
+        <a href="/privacidad.html">Privacidad</a>
+      </div>
+    </footer>
+    <script src="/tema.js"></script>
+  </body>
+</html>
